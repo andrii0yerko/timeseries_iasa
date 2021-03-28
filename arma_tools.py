@@ -23,14 +23,16 @@ def PACF(data, maxlag=None):
 
 def SMA(data, N):
     sma = data.rolling(N).mean()
-    sma.name += f' SMA (N={N})'
+    if sma.name is not None:
+        sma.name += f' SMA (N={N})'
     return sma
 
 def EMA(data, N, return_weights=False):
     a = 2 / (N + 1)
     w = [(1 - a)**n for n in range(N, 0, -1)]
     ema = data.rolling(N).apply(lambda window: (w * window).sum() / sum(w))
-    ema.name += f' EMA (N={N})'
+    if ema.name is not None:
+        ema.name += f' EMA (N={N})'
     return (ema, w) if return_weights else ema
 
 def AR(y, pacf_tolerance=None):
