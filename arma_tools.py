@@ -35,20 +35,21 @@ def EMA(data, N, return_weights=False):
         ema.name += f' EMA (N={N})'
     return (ema, w) if return_weights else ema
 
-def AR(y, pacf_tolerance=None):
+def AR(y, p=None, pacf_tolerance=None):
     """
     Estimate (p) for AR(p) and fit to y
     
     y               - time series
-    pacf_tolerance  - threshold for choosing q by PACF, 
+    pacf_tolerance  - threshold for choosing p by PACF, 
                       if None, using 1.96/sqrt(len(y))
     """
-    if pacf_tolerance is None:
-        pacf_tolerance = 1.96 / np.sqrt(len(y))
-    try:
-        p = np.where(abs(PACF(y, maxlag=12)) >= pacf_tolerance)[0].max()+1
-    except ValueError:
-        p = 0
+    if p is None:
+        if pacf_tolerance is None:
+            pacf_tolerance = 1.96 / np.sqrt(len(y))
+        try:
+            p = np.where(abs(PACF(y, maxlag=12)) >= pacf_tolerance)[0].max()+1
+        except ValueError:
+            p = 0
     Y = np.ones((len(y)-p, p+1))
     for k in range(1, p+1):
         Y[:, k] = y[p-k:-k]
